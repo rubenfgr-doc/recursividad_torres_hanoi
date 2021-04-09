@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang='es'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Torres Hanoi</title>
+
+    <style>
+        body {
+            text-align: center;
+        }
+
+        #div-by {
+            margin: 0px auto;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-weight: bold;
+            font-size: 2em;
+            line-height: 300px;
+        }
+
+        #div-hanoi {
+            margin: 0px auto;
+            width: fit-content;
+            display: flex;
+            flex-flow: row wrap;
+            gap: 20px;
+        }
+
+        .torre {
+            max-width: 300px;
+            padding: 20px;
+            display: flex;
+            flex-flow: column;
+            align-items: center;
+        }
+
+        .torre>div:nth-child(1) {
+            background-color: black;
+            width: 10px;
+            height: 200px;
+        }
+
+        .torre>div:nth-child(2) {
+            background-color: black;
+            width: 200px;
+            height: 10px;
+            margin-bottom: 10px;
+        }
+
+        #discos {
+            display: flex;
+            flex-flow: column;
+            align-items: center;
+        }
+
+        #torre1_discos,
+        #torre2_discos,
+        #torre3_discos {
+            position: absolute;
+            height: 200px;
+            width: 200px;
+            display: flex;
+            flex-flow: column-reverse;
+            align-items: center;
+        }
+
+        #disco1,
+        #disco2,
+        #disco3 {
+            height: 30px;
+            border: 1px solid black;
+        }
+
+        #disco1 {
+            width: 160px;
+            background-color: lightcoral;
+        }
+
+        #disco2 {
+            width: 130px;
+            background-color: lightseagreen;
+        }
+
+        #disco3 {
+            width: 100px;
+            background-color: lightgreen;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Recursividad - Torres Hanoi</h1>
+
+    <p>Se puede mover un solo disco a la vez</p>
+    <p>Un disco de mayor tamaño no puede estar sobre un disco más pequeño</p>
+    <p>Solo se puede desplazar el disco que esté más arriba en cada varilla</p>
+
+    <p><button id="btnInit">Iniciar</button></p>
+
+    <div id="torres_hanoi">
+        <div id="div-by"></div>
+        <div id="div-hanoi">
+            <div class="torre">
+                <div></div>
+                <div></div>
+                <div id="torre1_discos"></div>
+                <div>Torre Origen</div>
+            </div>
+            <div class="torre">
+                <div></div>
+                <div></div>
+                <div id="torre2_discos"></div>
+                <div>Torre Destino</div>
+            </div>
+            <div class="torre">
+                <div></div>
+                <div></div>
+                <div id="torre3_discos"></div>
+                <div>Torre Auxiliar</div>
+            </div>
+        </div>
+        <div id="discos">
+            <div id="disco1"></div>
+            <div id="disco2"></div>
+            <div id="disco3"></div>
+        </div>
+    </div>
+
+</body>
+
+<script>
+    const divBy = document.getElementById('div-by');
+    const divHanoi = document.getElementById('div-hanoi');
+    const btnInit = document.getElementById('btnInit');
+
+    const divTorresHanoi = document.getElementById('torres_hanoi');
+    const torre1Discos = document.getElementById('torre1_discos');
+    const torre2Discos = document.getElementById('torre2_discos');
+    const torre3Discos = document.getElementById('torre3_discos');
+
+    const disco1 = document.getElementById('disco1');
+    const disco2 = document.getElementById('disco2');
+    const disco3 = document.getElementById('disco3');
+
+    const discos = [disco1, disco2, disco3];
+
+    disco2.style.visibility = 'hidden';
+    disco3.style.visibility = 'hidden';
+
+    btnInit.addEventListener('click', () => {
+        btnInit.disabled = true;
+
+        let time = 0;
+        const margin = 1500;
+
+        setTimeout(() => {
+            torre1Discos.appendChild(disco1).animate([{ transform: 'translateY(-200px)' }, { transform: 'translateY(0px)' }], { duration: 500 });
+        }, time += margin);
+        setTimeout(() => {
+            torre1Discos.appendChild(disco2).animate([{ transform: 'translateY(-200px)' }, { transform: 'translateY(0px)' }, { visibility: 'visible' }], { duration: 500, fill: 'both' });
+        }, time += margin);
+        setTimeout(() => {
+            torre1Discos.appendChild(disco3).animate([{ transform: 'translateY(-200px)' }, { transform: 'translateY(0px)' }, { visibility: 'visible' }], { duration: 500, fill: 'both' });
+        }, time += margin);
+
+        const nDiscos = discos.length;
+
+        const hanoi = (nDiscos, origen, destino, auxiliar) => {
+            let disco = null;
+            if (nDiscos == 1) {
+                // Se mueve el disco desde el origen al destino
+                setTimeout(() => {
+                    console.log(`${origen.parentElement.lastElementChild.textContent} ==> ${destino.parentElement.lastElementChild.textContent}`);
+                    destino.appendChild(origen.lastChild).animate([{ transform: 'translateY(-200px)' }, { transform: 'translateY(0px)' }, { visibility: 'visible' }], { duration: 500, fill: 'both' });
+                }, time += margin);
+            } else {
+                // Mueve un disco desde el origen al auxiliar cuando n = 1
+                hanoi(nDiscos - 1, origen, auxiliar, destino);
+                setTimeout(() => {
+                    // Mueve un disco desde el origen al destino
+                    console.log(`${origen.parentElement.lastElementChild.textContent} ==> ${destino.parentElement.lastElementChild.textContent}`);
+                    destino.appendChild(origen.lastChild).animate([{ transform: 'translateY(-200px)' }, { transform: 'translateY(0px)' }, { visibility: 'visible' }], { duration: 500, fill: 'both' });
+                }, time += margin);
+                // Mueve un disco desde el auxiliar al destino cuando n = 1
+                hanoi(nDiscos - 1, auxiliar, destino, origen);
+            }
+        }
+
+        hanoi(nDiscos, torre1Discos, torre2Discos, torre3Discos);
+
+        setTimeout(() => {
+            divBy.style.display = 'block';
+            divHanoi.style.display = 'none';
+            divBy.innerHTML = "Design";
+            divBy.animate([{ opacity: 0 }, { transform: 'translateY(-300px)' }, { transform: 'translateY(0px)' }, { opacity: 1 }], { duration: 1500 });
+        }, time += margin);
+
+        setTimeout(() => {
+            divBy.innerHTML = "By";
+            divBy.animate([{ opacity: 0 }, { transform: 'translateX(-300px)' }, { transform: 'translateX(0px)' }, { opacity: 1 }], { duration: 1500 });
+        }, time += 1500);
+
+        setTimeout(() => {
+            divBy.innerHTML = "Ruben F.G.R";
+            divBy.animate([{ opacity: 0 }, { transform: 'translateX(300px)' }, { transform: 'translateX(0px)' }, { opacity: 1 }], { duration: 1500 });
+        }, time += 1500);
+
+        setTimeout(() => {
+            divBy.style.display = 'none';
+            divHanoi.style.display = 'flex';
+        }, time += 5000);
+
+        setTimeout(() => {
+            btnInit.disabled = false;
+        }, time += margin);
+    });
+
+</script>
+
+</html>
